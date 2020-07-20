@@ -135,16 +135,21 @@ plot(firstvote.merge$votegap, firstvote.merge$total.spent)
 margins <- unit(c(1,1,1,1),"cm")
 
 # spending density: bills that made it to the floor
-rollcall.plot <- ggplot(passages.merge) + geom_density(aes(x=total.spent), fill="green", alpha=0.5) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma) + theme_minimal() + ggtitle("Amount spent per roll-call vote\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(passages.merge$total.spent), linetype="dotted") + theme(text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8)) + theme(plot.margin=margins, panel.background = element_blank(), panel.grid = element_line(colour="#eeeeee"))
+rollcall.plot <- ggplot(passages.merge) + geom_density(aes(x=total.spent), fill="green", alpha=0.5) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma, limits=c(1,100000000)) + theme_minimal() + ggtitle("Amount spent per roll-call vote\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(passages.merge$total.spent), linetype="dotted", color="green") + theme(text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8)) + theme(plot.margin=margins, panel.background = element_blank(), panel.grid = element_line(colour="#eeeeee"))  + annotate("text", x = median(passages.merge$total.spent, na.rm=TRUE, size=8)+10000000, y=1, label= paste("Median:",scales::comma(round(median(passages.merge$total.spent, na.rm=TRUE)))))
 
 # spending density: all bills with lobbying
-allbills.plot <- ggplot(bills.allocated.final) + geom_density(aes(x=total.spent), fill="red", alpha=0.5) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma) + theme_minimal() + ggtitle("Amount spent per bill\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(bills.allocated.final$total.spent), linetype="dotted") + theme(plot.margin=margins, text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8))
+allbills.plot <- ggplot(bills.allocated.final) + geom_density(aes(x=total.spent), fill="red", alpha=0.5) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma, limits=c(1,100000000)) + theme_minimal() + ggtitle("Amount spent per bill\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(bills.allocated.final$total.spent), linetype="dotted", color="red") + theme(plot.margin=margins, text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8)) + annotate("text", x = median(bills.allocated.final$total.spent, na.rm=TRUE, size=8)+1000000, y=1, label= paste("Median:",scales::comma(round(median(bills.allocated.final$total.spent, na.rm=TRUE)))))
 
 # spending density: all issues
-#### PLOT: Density of per-issue spending
-issue.plot <- ggplot(issue.amounts) + geom_density(aes(x=issue.amount), fill="blue", alpha=0.5, bw=0.08) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma) + theme_minimal() + ggtitle("Amount spent per issue-lobbyist-quarter\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(issue.amounts$issue.amount, na.rm=TRUE), linetype="dotted") + theme(plot.margin=margins, text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8))# + annotate("text", x = median(issue.amounts$issue.amount, na.rm=TRUE, size=8)+260, y=1, label= paste("Median:",round(median(issue.amounts$issue.amount, na.rm=TRUE))))
+issue.plot <- ggplot(issue.amounts) + geom_density(aes(x=issue.amount), fill="blue", alpha=0.5, bw=0.08) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma, limits=c(1,100000000)) + theme_minimal() + ggtitle("Amount spent per issue-lobbyist-quarter\n(estimated)") + ylab("Density\n") + geom_vline(xintercept=median(issue.amounts$issue.amount, na.rm=TRUE), linetype="dotted", color="blue") + theme(plot.margin=margins, text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8)) + annotate("text", x = median(issue.amounts$issue.amount, na.rm=TRUE, size=8)+1000, y=1, label= paste("Median:",scales::comma(round(median(issue.amounts$issue.amount, na.rm=TRUE)))))
 
 full.plot <- ggarrange(rollcall.plot, allbills.plot, issue.plot, ncol=2, nrow=2)
 
-# output all together
 ggsave("spending_plots.png", full.plot, width=9, height=9)
+
+# combined into a single plot
+# spending density: bills that made it to the floor
+combined.plot <- ggplot() + geom_density(data = passages.merge, aes(x=total.spent), fill="green", alpha=0.5) + scale_x_continuous(trans="log10", name="\nDollars", labels=comma, limits=c(1,100000000)) + theme_minimal() + ylab("Density\n") + theme(text=element_text(size=12,  family="Helvetica"), axis.text.x = element_text(size=8)) + theme(plot.margin=margins, panel.background = element_blank(), panel.grid = element_line(colour="#eeeeee")) + geom_density(data = issue.amounts, aes(x=issue.amount), fill="blue", alpha=0.5, bw=0.08) + geom_density(data = bills.allocated.final, aes(x=total.spent), fill="red", alpha=0.5) + geom_vline(xintercept=median(issue.amounts$issue.amount, na.rm=TRUE), linetype="dotted", color="blue") + geom_vline(xintercept=median(passages.merge$total.spent), linetype="dotted", color="green") + geom_vline(xintercept=median(bills.allocated.final$total.spent), linetype="dotted", color="red") + ggtitle("Spending on ")
+
+
+# output all together

@@ -97,7 +97,7 @@ v.3 <- full.ce(20000, 10000000, 0, 0.05, 1, 100000000, 0.1)
 v.4 <- full.ce(20000, 10000000, 0, 0.01, 1, 100000000, 0.1)
 
 color.assignment <- c("Original" = "#D53E4F", "Variation 1" = "#3288BD", "Variation 2" = "#66C2A5", "Variation 3" = "#FEE08B", "Variation 4"="#E6F598")
-  
+
 plot.boundaries <- c(-100000000,-1000000,-10000,-100,0,100,10000,1000000,100000000)
 limits <- c(min(plot.boundaries),max(plot.boundaries))
 plot <- ggplot()
